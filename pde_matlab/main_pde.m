@@ -22,7 +22,7 @@ dx = r_max/(nx-1);
 r = r0 + (dx * (1:nx)-dx);
 
 % diffusion parameter
-D = 100*1e3; %% needed to be large : units? not sure it make sens
+D = 50*1e3; %% needed to be large : units? not sure it make sens
 
 % initial density of cells : gaussian
 mu = 45.0;
@@ -42,25 +42,18 @@ Ltotal = tg0 + sum( v.*u)/sum(u) / vl; % total lipid intra+extra cellular (in mo
 
 L = tg0; %% variable extra cellular lipid (in mol)
 
-tmax = 10*100000;
+tmax = 100000;
 Ls = zeros(tmax,3); %time, store external lipid, lipid in cell 
 
 t =  0.0;
 
 figure()
 
-%plot(r,u0)
-%for K=1:tmax
-u_old = 1e4*(ones(size(u)));
-Aa = norm(u_old(:) - u(:))/norm(u(:)); 
-K = 1;
-norm(u_old(:) - u(:))/norm(u(:))
+plot(r,u0)
 
-%while(norm(u_old(:) - u(:))/norm(u(:)) > 1e-6)
 for(K = 1: tmax)
 %norm(u_old(:) - u(:))/norm(u(:))
     u_old(:) = u(:);
-    
     
     [lg, lp] = drr1(r,v0,L, a,ra,na,b,kl,vl, KL, B); % compute velocity at current L for all l and r
     
@@ -83,8 +76,8 @@ for(K = 1: tmax)
     % we can also test 
     %Flux(1) = 100;
     %Flux(1) = 100*L;
-%  u(2:nx-1)=u(2:nx-1)-(dt/dx)*(Flux(2:nx-1)-Flux(1:nx-2)) + 0.5*br*(u(1:nx-2)+u(3:nx)-2*u(2:nx-1)); % update density  
     
+    %u(2:nx-1)=u(2:nx-1)-(dt/dx)*(Flux(2:nx-1)-Flux(1:nx-2)) + 0.5*br*(u(1:nx-2)+u(3:nx)-2*u(2:nx-1)); % update density  
     u(2:nx-1)=u(2:nx-1)-(dt/dx)*(Flux(2:nx-1)-Flux(1:nx-2)); % update density
  
     % since they are never updated u(1) = u(nx) = 0
@@ -98,15 +91,15 @@ for(K = 1: tmax)
     Ls(K,:) = [t, L, sum(v.*u)/sum(u)/ vl]; % store lipid + cell lipid
     
     %test les zeros :
-    if(mod(K, 10000) == 0)
+    if(mod(K, 1000) == 0)
         g = @(r) A1(r,a, ra, KL, B, b, kl, v0, vl, na, L);
         data = [];  
         for rr=r0:r_max
             data = [data; fzero(g, rr)];
         end;
         %unique(data)
-        %plot(r,u)
-        %drawnow
+        plot(r,u)
+        drawnow
     end
     
     %plot(r,u,r,u0); drawnow
@@ -117,3 +110,20 @@ norm(u_old(:) - u(:))/norm(u(:))
 
 plot(r,u,r,u0)
 figure(2);plot(Ls(:,1), Ls(:,2), 'r', Ls(:,1), Ls(:,3),'b');% lipid evolution
+
+
+%% calcul integral rmin to rmax of drr1
+Lfin = Ls(end,2);
+mass = integral( @(x) exp(-(x-mu).^2 * si), r0, r_max )
+Tau_r = @(x) A1(x,a,ra, KL, B, b, kl, v0, vl, na, Lfin);
+
+equi = zeros(size(r));
+for i=1:length(r)
+    equi(i) = exp(1/D * integral(Tau_r,r0,r(i)) );
+end
+
+int_equi = sum(equi) - 0.5*(equi(1)+equi(end));
+C = 1. ; %mass / int_equi; 
+
+figure(3);
+plot(r, u, r, C*equi);
