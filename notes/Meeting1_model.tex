@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[latin1,utf8]{inputenc}
+\usepackage{natbib}
+\usepackage[english, french]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{subfig}
+\usepackage{tikz}
+\maxdeadcycles=1000
+%\geometry{ left = 60pt , right = 60pt }
+\graphicspath{{./Fig/}}
+
+\definecolor{mypurple}{RGB}{127,0,255}
+\newcommand{\CA}[1]{{\color{mypurple} \emph{CA : #1} }}
+
+\begin{document}
+\paragraph{First model considered for adipocytes ``growing''.\\}
+$L$ lipides in the blood\\
+$u(t,r)$ adipocytes number at time $t$ of radius $r$\\
+The link between $r$ and $l$ is the following,
+$$V_l l = \dfrac{4}{3} \pi r^3 - V_{min}$$
+with $V_{min} = \dfrac{4}{3} \pi r_{min}^3$ and $\dfrac{dl}{dt} = \dfrac{4\pi}{V_l} \dfrac{dr}{dt} r^2$.\\
+
+Model the lipogenesis and the lipolysis (fluxes of triglycerides $l$) : 
+$$\dfrac{dl}{dt} = V_l a r^2 \dfrac{L}{L + \kappa_L} \dfrac{\kappa_r^n}{r^n+\kappa_r^n} - V_l (B + br^2) \dfrac{l}{l + \kappa_t V_l}$$
+we rewrite with the variable $r$ : 
+$$\dfrac{dr}{dt} = \dfrac{aV_l}{4\pi}  \dfrac{L}{L + \kappa_L} \dfrac{\kappa_r^n}{r^n+\kappa_r^n} - V_l \dfrac{(B + br^2)}{4\pi r^2} \dfrac{\dfrac{4}{3} \pi r^3 - V_{min}}{\dfrac{4}{3} \pi r^3 - V_{min} + V_l\kappa_t} = \tau(r, L)$$
+From these fluxes, the dynamics of the number of adypocytes $u$ is described by 
+$$\partial_t u(t, r) + \partial_r( \tau(r, L) u - D \partial_r u) = 0$$
+with $D$ a diffusion coefficient.
+The intracellular quantity of triglycerides is $U(t) = \displaystyle \int l \rho_u dl$ with $\rho_u$ adipocytes density. The total amount of triglycerides is assumed constant over time : $\dfrac{d}{dt}(L(t) + U(t)) = 0$ and $\dfrac{dL}{dt} = -\dfrac{dU}{dt}$
+ 
+\paragraph{boundary/initial conditions.}
+$u(0, r) =$ Gaussian density (minimum = $r_{min}$), first test : unimodal (Q: can we recover the bimodal distribution that is observed).\\
+$L(t) = L_0 + U(0) - U(t)$\\
+$(\tau(r, L) u(t,r) - D \partial_r u(t,r)) |_{r_{max}} = 0$
+\paragraph{Recruitment of new adipocytes.} We assumed that when the level of triglycerides increases too largely, pre-adipocytes differentiate into adipocytes. This recruitment is modeled with the $r_{min}$ BC, as follows,
+$$(\tau(r, L) u(t,r) - D \partial_r u(t,r)) |_{r_{min}}= f(L)$$ with $f(L) = \alpha L$ or $f(L) = \alpha \dfrac{L}{(L+\kappa)}$ 
+
+
+\end{document}
