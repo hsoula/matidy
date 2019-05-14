@@ -5,7 +5,7 @@ close all;
 
 r0 = 15; % mum
 vl = 1e6; % from mol to mum
-a = 0.5; %0.3; % mol.mum^-2 h^-1       %% need a larger a to have bimodal
+a = 0.3; %0.3; % mol.mum^-2 h^-1       %% need a larger a to have bimodal
 b = 0.27; % mol.mum^-2 h^-1
 B = 125;  % mol.h^-1
 ra = 200; % mum
@@ -109,21 +109,21 @@ Tmax = t
 norm(u_old(:) - u(:))/norm(u(:))
 
 plot(r,u,r,u0)
-figure(2);plot(Ls(:,1), Ls(:,2), 'r', Ls(:,1), Ls(:,3),'b');% lipid evolution
+%figure(2);plot(Ls(:,1), Ls(:,2), 'r', Ls(:,1), Ls(:,3),'b');% lipid evolution
 
 
-%% calcul integral rmin to rmax of drr1
+%% calcul integral rmin to rmax of drr1 : stationnary solution
 Lfin = Ls(end,2);
 mass = integral( @(x) exp(-(x-mu).^2 * si), r0, r_max )
-Tau_r = @(x) A1(x,a,ra, KL, B, b, kl, v0, vl, na, Lfin);
+Tr = @(x) A1(x,a,ra, KL, B, b, kl, v0, vl, na, Lfin);
 
 equi = zeros(size(r));
 for i=1:length(r)
-    equi(i) = exp(1/D * integral(Tau_r,r0,r(i)) );
+    equi(i) = exp(1/D * integral(Tr, r0, r(i)) );
 end
 
-int_equi = sum(equi) - 0.5*(equi(1)+equi(end));
-C = 1. ; %mass / int_equi; 
+int_equi = dx*(sum(equi) - 0.5*(equi(1)+equi(end)));
+C = mass / int_equi; 
 
 figure(3);
 plot(r, u, r, C*equi);

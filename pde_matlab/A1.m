@@ -1,7 +1,11 @@
-function y = A1(r,a, kr, kL, B, b, kt, V0, Vl, n, L0)
+function y = A1(r,a, kr, kL, B, b, kt, v0, vl, na, L0)
 
-l = (4*pi/3 * r.^3 - V0)/Vl;
-y = a * r.^2 * L0 ./(L0 + kL) .* 1./(1+(r/kr).^n) - (B + b * r.^2).* l ./(kt + l) ;
+    v = 4 / 3 * pi * r .^3;
+    
+    Tau_r = (a /(4*pi) * 1./(1 + (r/kr).^na) * L0/(kL+L0)) - (B + b * r.^2)./(4*pi * r.^2) .* (v - v0)./(v - v0 + kt*vl);
+    y = vl * Tau_r;
+end
+
  
  
  
