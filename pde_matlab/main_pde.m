@@ -5,7 +5,7 @@ close all;
 
 r0 = 15; % mum
 vl = 1e6; % from mol to mum
-a = 0.3; %0.3; % mol.mum^-2 h^-1       %% need a larger a to have bimodal
+a = 0.5; %0.3; % mol.mum^-2 h^-1       %% need a larger a to have bimodal
 b = 0.27; % mol.mum^-2 h^-1
 B = 125;  % mol.h^-1
 ra = 200; % mum
@@ -19,7 +19,8 @@ tg0 = 3; % initial external lipid (in mol)
 nx = 500;
 r_max = 300; % mum
 dx = r_max/(nx-1);
-r = r0 + (dx * (1:nx)-dx);
+rmin = r0 - dx;
+r = rmin + (dx * (1:nx)-dx);
 
 % diffusion parameter
 D = 50*1e3; %% needed to be large : units? not sure it make sens
@@ -36,13 +37,13 @@ u(1) = 0;
 u(end) = 0;
 
 % volumes
-v = 4 / 3 * pi * (r + r0).^3;
+v = 4 / 3 * pi * r.^3;
 v0 = 4 / 3 * pi * r0^3;
-Ltotal = tg0 + sum( v.*u)/sum(u) / vl; % total lipid intra+extra cellular (in mol)
+Ltotal = tg0 +  dx* sum( (v-v0).*u .*(4*pi .*r.^2 ./ vl.^2)); % total lipid intra+extra cellular (in mol)
 
 L = tg0; %% variable extra cellular lipid (in mol)
 
-tmax = 100000;
+tmax = 1*100000;
 Ls = zeros(tmax,3); %time, store external lipid, lipid in cell 
 
 t =  0.0;
@@ -81,26 +82,26 @@ for(K = 1: tmax)
     u(2:nx-1)=u(2:nx-1)-(dt/dx)*(Flux(2:nx-1)-Flux(1:nx-2)); % update density
  
     % since they are never updated u(1) = u(nx) = 0
-   
-    L = Ltotal - sum(v.*u)/sum(u)/ vl; % update external lipid content
+    L = Ltotal - dx* sum( (v-v0).*u .* (4 * pi .*r.^2 ./ vl^2)); % update external lipid content
     if L <0
         L=0;
     end
     
     t = t+dt; % update time
-    Ls(K,:) = [t, L, sum(v.*u)/sum(u)/ vl]; % store lipid + cell lipid
+    Ut = dx* sum( (v-v0).*u .* (4 * pi .*r.^2 ./ vl^2)); % total intracell lipid
+    Ls(K,:) = [t, L, Ut]; % store lipid + cell lipid
     
     %test les zeros :
-    if(mod(K, 1000) == 0)
-        g = @(r) A1(r,a, ra, KL, B, b, kl, v0, vl, na, L);
-        data = [];  
-        for rr=r0:r_max
-            data = [data; fzero(g, rr)];
-        end;
+    %if(mod(K, 1000) == 0)
+    %    g = @(r) A1(r,a, ra, KL, B, b, kl, v0, vl, na, L);
+    %    data = [];  
+    %    for rr=r0:r_max
+    %        data = [data; fzero(g, rr)];
+    %    end;
         %unique(data)
-        plot(r,u)
-        drawnow
-    end
+        %plot(r,u)
+        %drawnow
+    %end
     
     %plot(r,u,r,u0); drawnow
 % plot result
@@ -108,7 +109,7 @@ end
 Tmax = t
 norm(u_old(:) - u(:))/norm(u(:))
 
-plot(r,u,r,u0)
+%plot(r,u,r,u0)
 %figure(2);plot(Ls(:,1), Ls(:,2), 'r', Ls(:,1), Ls(:,3),'b');% lipid evolution
 
 
