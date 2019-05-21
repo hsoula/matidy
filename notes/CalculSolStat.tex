@@ -20,25 +20,28 @@
 \newcommand{\CA}[1]{{\color{mypurple} \emph{CA : #1} }}
 
 \begin{document}
+\begin{center}
+\large \textbf{Stationary solution(s)}
+\end{center}
 Search for a stationary solution $u^{\infty}(r)$, that verifies $\partial_t u^{\infty}(t, r) = 0$ so the following equation
 $$\partial_t u(t, r) + \partial_r( \tau(r, L) u - D \partial_r u) = 0$$
 becomes 
 $$\partial_r( \tau(r, L^{\infty}) u^{\infty} - D \partial_r u^{\infty}) = 0$$
-so $\tau(r, L^{\infty}) u^{\infty}(r) - D \partial_r u^{\infty}(r) = constante$
-with the boundary conditions (that are equal to zero), it leads to $\tau(r, L^{\infty}) u^{\infty} = D \partial_r u^{\infty}$
-where $L^{\infty} = L_0 + U_0 - U(t) = L_0 + U_0 - \int_{r_{min}}^{r_{max}} \dfrac{1}{V_l}(\dfrac{4}{3} \pi r^3 - V_{min})u^{\infty}(r) \dfrac{4\pi r^ 2}{V_l} dr$.
+and $\tau(r, L^{\infty}) u^{\infty}(r) - D \partial_r u^{\infty}(r) = cste$
+with the boundary conditions:
+$$(\tau(r, L) u(t,r) - D \partial_r u(t,r)) |_{r_{min}} = 0$$
+$$(\tau(r, L) u(t,r) - D \partial_r u(t,r)) |_{r_{max}} = 0$$
+It leads to $\tau(r, L^{\infty}) u^{\infty} = D \partial_r u^{\infty}$ where 
+$$L^{\infty} = L_0 + U_0 - U(t) = L_0 + U_0 - \displaystyle \int_{r_{min}}^{r_{max}} \dfrac{1}{V_l}(\dfrac{4}{3} \pi r^3 - V_{min})u^{\infty}(r) \dfrac{4\pi r^ 2}{V_l} dr.$$
 So the value $L^{\infty}$ depend on $u^{\infty}$.
-
 And $\tau(r, L)$ is defined by 
-$$ \tau(r, L) = \dfrac{aV_l}{4\pi}  \dfrac{L}{L + \kappa_L} \dfrac{\kappa_r^n}{r^n+\kappa_r^n} - V_l \dfrac{(B + br^2)}{4\pi r^2} \dfrac{\dfrac{4}{3} \pi r^3 - V_{min}}{\dfrac{4}{3} \pi r^3 - V_{min} + V_l\kappa_t}$$
-
-So, when $D \neq 0$ we have $u^{\infty} = \displaystyle C \exp \left( \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right)$.
-We can characterized $C$ with the initial condition, because the total number of cell is constant : 
-$$ C = \displaystyle \dfrac{ \int_{r_{min}}^{r_{max}} u(0,s) ds}{\int_{r_{min}}^{r_{max}} \exp  \left( \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right) dr}$$
-
-We then have a system of equation to solve in order to compute $L^{\infty}$ and $u^{\infty}$ : 
-$$L^{\infty} = L_0 + U_0 - \int_{r_{min}}^{r_{max}} \dfrac{1}{V_l}(\dfrac{4}{3} \pi r^3 - V_{min})u^{\infty}(r) \dfrac{4\pi r^ 2}{V_l} dr$$.
-$$u^{\infty} = \displaystyle \dfrac{ \int_{r_{min}}^{r_{max}} u(0,s) ds}{\int_{r_{min}}^{r_{max}} \exp  \left( \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{infty}) ds \right) dr}  \, \exp \left( \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{infty}) ds \right).$$
+$$ \tau(r, L) = \dfrac{aV_l}{4\pi}  \dfrac{L}{L + \kappa_L} \dfrac{\kappa_r^n}{r^n+\kappa_r^n} - V_l \dfrac{(B + br^2)}{4\pi r^2} \dfrac{\dfrac{4}{3} \pi r^3 - V_{min}}{\dfrac{4}{3} \pi r^3 - V_{min} + V_l\kappa_t}.$$
+So, when $D \neq 0$ we have $u^{\infty} = \displaystyle C \exp \left(\displaystyle  \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right)$.
+We can characterize $C$ with the initial condition, because the total number of cells is constant: 
+$$ C = \displaystyle \dfrac{ \displaystyle \int_{r_{min}}^{r_{max}} u(0,s) ds}{\displaystyle \int_{r_{min}}^{r_{max}} \exp  \left( \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right) dr}.$$
+We then have a system of 2 equations to solve in order to obtain $L^{\infty}$ and $u^{\infty}$: 
+$$L^{\infty} = L_0 + U_0 - \displaystyle \int_{r_{min}}^{r_{max}} \dfrac{1}{V_l}(\dfrac{4}{3} \pi r^3 - V_{min})u^{\infty}(r) \dfrac{4\pi r^ 2}{V_l} dr$$.
+$$u^{\infty} = \displaystyle \dfrac{ \displaystyle \int_{r_{min}}^{r_{max}} u(0,s) ds}{\displaystyle \int_{r_{min}}^{r_{max}} \exp  \left(\displaystyle  \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{min}}^{r} \dfrac{1}{D} \tau(s, L^{\infty}) ds \right).$$
 
 
 

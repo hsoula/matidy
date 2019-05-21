@@ -34,7 +34,8 @@ $$\dfrac{dr}{dt} = \dfrac{aV_l}{4\pi}  \dfrac{L}{L + \kappa_L} \dfrac{\kappa_r^n
 From these fluxes, the dynamics of the number of adypocytes $u$ is described by 
 $$\partial_t u(t, r) + \partial_r( \tau(r, L) u - D \partial_r u) = 0$$
 with $D$ a diffusion coefficient.
-The intracellular quantity of triglycerides is $U(t) = \displaystyle \int l \rho_u dl$ with $\rho_u$ adipocytes density. The total amount of triglycerides is assumed constant over time : $\dfrac{d}{dt}(L(t) + U(t)) = 0$ and $\dfrac{dL}{dt} = -\dfrac{dU}{dt}$
+The intracellular quantity of triglycerides is $U(t) = \displaystyle \int l \rho_u dl$ with $\rho_u$ adipocytes density. So we can write (the integral in $r$) $$U(t) =  \displaystyle \int_{r_{min}}^{r_{max}} \dfrac{1}{V_l}(\dfrac{4}{3} \pi r^3 - V_{min})u(t,r) \dfrac{4\pi r^ 2}{V_l} dr.$$
+The total amount of triglycerides is assumed constant over time : $\dfrac{d}{dt}(L(t) + U(t)) = 0$ and $\dfrac{dL}{dt} = -\dfrac{dU}{dt}$
  
 \paragraph{boundary/initial conditions.}
 $u(0, r) =$ Gaussian density (minimum = $r_{min}$), first test : unimodal (Q: can we recover the bimodal distribution that is observed).\\
