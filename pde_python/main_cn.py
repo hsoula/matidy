@@ -4,22 +4,18 @@ from numpy import linalg
 
 import matplotlib.pyplot as plt
 
+from scipy import integrate
+from scipy import sparse
+from scipy.sparse.linalg import inv
+from scipy.sparse.linalg import spsolve
+
 import drr1
 
 import A1
 
-from scipy import integrate
+#=================================================
 
-from scipy import sparse
-
-from scipy.sparse.linalg import inv
-from scipy.sparse.linalg import spsolve
-
-from numpy.linalg import norm
-
-# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite.
-
-
+# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer Ltotal à la place de L(0).
 
 r0 = 15   # mum
 vl = 1e6  # from mol to mum
@@ -31,11 +27,10 @@ nr = 3    # hill radius
 kt = 0.01 #  mol
 kL = 0.1  # mol
 
+Ltotal = 4 # initial total lipid in mol
 
 
-tg0 = 3 # initial external lipid in mol
-
-
+#--------------------------------------------------
 # Pas en r et r_max
 
 nx    = 500
@@ -46,10 +41,12 @@ rmin = r0 - dx
 
 r = rmin + (dx * np.arange(1,nx+1) - dx)
 
+#--------------------------------------------------
 # Diffusion parameter
 
 D = 50 * 1e3 # needed to be large : units? not sure it makes sens
 
+#--------------------------------------------------
 # Initial density of cells : gaussian
 
 mu = 45.0
@@ -58,21 +55,23 @@ si = 0.01
 u0 = np.exp(-(r - mu)**2 * si)
 u = u0 # density vector
 
-
+#--------------------------------------------------
 # Boundary conditions
 u[0]  = 0
 u[-1] = 0
 
+#--------------------------------------------------
 # Volumes
 
 v  = (4/3.) * np.pi * r**3
 v0 = (4/3.) * np.pi * r0**3
 
-Ltotal = tg0 + dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2))#total lipid, intra + extra cellular, in mol
+#--------------------------------------------------
 
-L = tg0 # variable extracellular lipid, in mol
+L = Ltotal - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2)) # variable extracellular lipid, in mol
 
-# Construction des matrices
+#--------------------------------------------------
+# Construction des matrices pour le schéma explicites
 
 E  = np.ones(nx-5)
 E  = np.concatenate(([1],2*E,[1]),axis = None)
@@ -82,6 +81,7 @@ C = sparse.diags([-E_,E,-E_],[-1,0,1])
 	
 C = sparse.csc_matrix(C)
 
+#--------------------------------------------------
 Ls = []
 
 t=0.0
@@ -90,6 +90,8 @@ u_old = np.zeros(np.size(u0))
 norme = 1
 K=0
 
+
+#--------------------------------------------------
 while(norme > 1e-12) :
 	K+=1
 	u_old = np.array(u)
@@ -118,8 +120,6 @@ while(norme > 1e-12) :
 	
 	A  = sparse.identity(nx-3) + beta * C
 	A  = sparse.csc_matrix(A)
-	#A_ = inv(A)
-
 	  
 	u[1:-2] = spsolve(A,u[1:-2] - (dt/dx) * (Flux[1:-2] - Flux[0:-3]))
 	u[0]  = 0
@@ -136,10 +136,10 @@ while(norme > 1e-12) :
 	    
 	Ls.append([t,L,Ut])
 	
-	norme = norm(u_old-u)/float(norm(u_old))
+	norme = linalg.norm(u_old-u)/float(linalg.norm(u_old))
 
 
-
+#--------------------------------------------------
 
 func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
@@ -156,7 +156,6 @@ int_equi = dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 C = mass/int_equi
 
 
-
 plt.plot(r,u,label = "u")
 plt.plot(r,C*equi,label = "u_inf")
 plt.legend(loc = "upper right")
@@ -164,6 +163,5 @@ plt.show()
 
 print("Convergence atteinte en",K,"étapes avec norme =",norme)
 
-	
 
-
+#=================================================

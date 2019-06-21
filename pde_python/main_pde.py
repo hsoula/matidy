@@ -10,7 +10,9 @@ from scipy import integrate
 
 from numpy.linalg import norm
 
+#=================================================
 
+# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer Ltotal à la place de L(0).
 
 r0 = 15   # mum
 vl = 1e6  # from mol to mum
@@ -22,11 +24,10 @@ nr = 3    # hill radius
 kt = 0.01 #  mol
 kL = 0.1  # mol
 
+Ltotal = 4 # initial total lipid in mol
 
 
-tg0 = 3 # initial external lipid in mol
-
-
+#--------------------------------------------------
 # Pas en r et r_max
 
 nx    = 500
@@ -37,11 +38,12 @@ rmin = r0 - dx
 
 r = rmin + (dx * np.arange(1,nx+1) - dx)
 
-
+#--------------------------------------------------
 # Diffusion parameter
 
 D = 50 * 1e3 # needed to be large : units? not sure it makes sens
 
+#--------------------------------------------------
 # Initial density of cells : gaussian
 
 mu = 45.0
@@ -50,19 +52,22 @@ si = 0.01
 u0 = np.exp(-(r - mu)**2 * si)
 u = u0 # density vector
 
+#--------------------------------------------------
 # Boundary conditions
-
 u[0]  = 0
 u[-1] = 0
 
+#--------------------------------------------------
 # Volumes
 
 v  = (4/3.) * np.pi * r**3
 v0 = (4/3.) * np.pi * r0**3
 
-Ltotal = tg0 + dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2))  #total lipid, intra + extra cellular, in mol
+#--------------------------------------------------
 
-L = tg0 # variable extracellular lipid, in mol
+L = Ltotal - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2)) # variable extracellular lipid, in mol
+
+#--------------------------------------------------
 
 t=0.0
 
@@ -71,6 +76,8 @@ Ls = []
 u_old = np.zeros(np.size(u0))
 norme = 1
 K=0
+
+#--------------------------------------------------
 
 while(norme > 1e-12) :
 	K+=1
@@ -116,6 +123,9 @@ while(norme > 1e-12) :
 	norme = norm(u_old-u)/float(norm(u_old))
 
  
+ 
+#--------------------------------------------------
+
 func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
 func_tau  = lambda x : A1.A1(x,a,kr,nr,kL,B,b,kt,v0,vl,Ls[-1][1])
@@ -139,9 +149,4 @@ plt.show()
 
 print("Convergence atteinte en",K,"étapes avec norme =",norme)
 
-"""
-plt.plot(np.arange(K),Ls[:,1],"o",label="L")
-plt.plot(np.arange(K),Ls[:,2],"o",label="U")
-plt.legend(loc="center right")
-plt.show()
-"""
+#===================================================

@@ -1,6 +1,8 @@
 import numpy as np
 
+#====================================================
 
+# Calcul de la fonction de transport
 
 def A1(r,a,kr,nr,kL,B,b,kt,v0,vl,L0) :
 	v = 4/3. * np.pi * r**3
@@ -10,3 +12,5 @@ def A1(r,a,kr,nr,kL,B,b,kt,v0,vl,L0) :
 	y = vl * Tau_r
 	
 	return y
+	
+#====================================================
