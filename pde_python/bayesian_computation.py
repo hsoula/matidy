@@ -11,6 +11,7 @@ import scipy.optimize as opt
 from scipy import integrate
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 import A1
 
@@ -129,10 +130,14 @@ L0 = opt.root(R_,p0[-1],args=(p0)).x
 	
 u0 = u_from_L(L0,p0)
 
+#noise = 0.02 * np.random.normal(size=r.size)
+	
+#u0+=noise
+
 
 #---------------------------------------------------------
 
-epsilon = 0.05
+epsilon = 0.1
 
 N = 10000
 
@@ -159,67 +164,74 @@ P[:,5] = np.random.uniform(0,8,N)
 # On construit set_P, l'ensemble des jeu de paramètre qu'on va garder.
 set_P  = p0
 
+E=[0]
+
 for index,p in enumerate(P) :
 	print(index)
 	diss =  xhi2_pde(p,u0)
 	#print(diss)
-	
 	if diss < epsilon :
 		set_P = np.vstack([set_P,p])
+		E.append(diss)
 		
 print (len(set_P))
 
-#hist_a = np.histogram(set_P[:,0],bins = 100,range = [0.3,0.7])[0]
-#
-#s_a = np.linspace(0.3,0.7,100)
-#
-#plt.plot(s_a,hist_a)
-#plt.show()
-
-#for i in [0,3,5] :
-#	fig, axs = plt.subplots(2)
-#	axs[0].hist([set_P[:,i],P[:,i]],bins = 100,stacked = 'bar')
-#	axs[1].hist(set_P[:,i],bins = 100)
-#	
-#	fig.tight_layout()
-#	plt.show()
-
 nb_bins = 500
 
-fig, axs = plt.subplots(2,3)
-
-axs[0][0].hist(set_P[:,0],bins = nb_bins,range = [0,2])
-axs[0][0].hist(P[:,0],bins = nb_bins,alpha= 0.5,range = [0,2])
-axs[1][0].hist(set_P[:,0],bins = nb_bins)
-
-axs[0][1].hist(set_P[:,3],bins = nb_bins,range = [0,1])
-axs[0][1].hist(P[:,3],bins = nb_bins,alpha= 0.5,range = [0,1])
-axs[1][1].hist(set_P[:,3],bins = nb_bins)
-
-axs[0][2].hist(set_P[:,5],bins = nb_bins,range = [0,8])
-axs[0][2].hist(P[:,5],bins = nb_bins,alpha= 0.5,range = [0,8])
-axs[1][2].hist(set_P[:,5],bins = nb_bins)
+fig = plt.figure()
+ax0_a    = fig.add_subplot(231)
+ax1_a    = fig.add_subplot(234)
+ax0_KL   = fig.add_subplot(232)
+ax1_KL   = fig.add_subplot(235)
+ax0_Ltot = fig.add_subplot(233)
+ax1_Ltot = fig.add_subplot(236)
 
 
-axs[1][0].set(xlabel = "a")
-axs[1][1].set(xlabel = "KL")
-axs[1][2].set(xlabel = "Ltot")
+ax0_a.hist(set_P[:,0],bins = nb_bins,range = [0,2])
+ax0_a.hist(P[:,0],bins = nb_bins,alpha= 0.5,range = [0,2])
+ax1_a.hist(set_P[:,0],bins = nb_bins)
+
+ax0_KL.hist(set_P[:,3],bins = nb_bins,range = [0,1])
+ax0_KL.hist(P[:,3],bins = nb_bins,alpha= 0.5,range = [0,1])
+ax1_KL.hist(set_P[:,3],bins = nb_bins)
+
+ax0_Ltot.hist(set_P[:,5],bins = nb_bins,range = [0,8])
+ax0_Ltot.hist(P[:,5],bins = nb_bins,alpha= 0.5,range = [0,8])
+ax1_Ltot.hist(set_P[:,5],bins = nb_bins)
+
+ax1_a.axvline(x=p0[0],ls="--",color='black')
+ax1_KL.axvline(x=p0[3],ls="--",color='black')
+ax1_Ltot.axvline(x=p0[5],ls="--",color='black')
+
+ax1_a.set(xlabel = r'$a$')
+ax1_KL.set(xlabel = r'$\kappa_L$')
+ax1_Ltot.set(xlabel = r'$L_{total}$')
+
+ax0_a.set(ylabel='Nombre de paramètre')
+ax1_a.set(ylabel='Nombre de paramètre')
+
+orange_patch = mpatches.Patch(color='orange', alpha=0.5)
+blue_patch = mpatches.Patch(color='blue')
 
 fig.tight_layout()
+lgd = ax1_Ltot.legend([orange_patch,blue_patch],['Paramètres générés','Paramètres conservés'],bbox_to_anchor=(1.04,1), loc="upper left")
+#fig.savefig('../Rapport/Images/abc_distrib.png',dpi=1200,bbox_extra_artists=[lgd,],bbox_inches='tight')
+fig.show()
+
+fig,axs = plt.subplots(3)
+
+axs[0].plot(set_P[:,0],E,"o",markersize=1)
+axs[1].plot(set_P[:,3],E,"o",markersize=1)
+axs[2].plot(set_P[:,5],E,"o",markersize=1)
+
+axs[0].set(xlabel = r'$a$',ylabel='Erreur')
+axs[1].set(xlabel = r'$\kappa_L$',ylabel='Erreur')
+axs[2].set(xlabel = r'$L_{total}$',ylabel='Erreur')
+
+axs[0].axvline(x=p0[0],ls="--",color='black')
+axs[1].axvline(x=p0[3],ls="--",color='black')
+axs[2].axvline(x=p0[5],ls="--",color='black')
+
+fig.tight_layout()
+#plt.savefig('../Rapport/Images/abc_error.png',dpi=1200)
 plt.show()
-
-
-
-"""
-plot_set = np.random.randint(len(set_P),size = 100)
-
-for i in plot_set :
-	Lp = opt.root(R_,set_P[i,-1],args=(set_P[i])).x
-	
-	up = u_from_L(Lp,set_P[i])
-	
-	plt.plot(r,up)
-
-plt.plot(r,u0)
-plt.show()
-"""
