@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 26 10:39:36 2019
+@author: Léo Meyer
+
+"""
 
 import numpy as np
 
