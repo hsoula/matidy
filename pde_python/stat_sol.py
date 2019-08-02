@@ -2,7 +2,7 @@
 """
 Created on Tue Jul  9 14:28:40 2019
 
-@author: leo
+@author: Léo Meyer
 """
 
 import scipy.optimize as opt
