@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 26 10:39:36 2019
+@author: Léo Meyer
+
+"""
+
 import numpy as np
-
-
-
 
 def drr1(r,a,kr,nr,kL,B,b,kt,v0,vl,L)    :
 	
