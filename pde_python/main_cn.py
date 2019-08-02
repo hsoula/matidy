@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 26 10:39:36 2019
+@author: Léo Meyer
+
+"""
+
 import numpy as np
 
 from numpy import linalg
@@ -6,7 +13,6 @@ import matplotlib.pyplot as plt
 
 from scipy import integrate
 from scipy import sparse
-from scipy.sparse.linalg import inv
 from scipy.sparse.linalg import spsolve
 
 import drr1
@@ -15,7 +21,7 @@ import A1
 
 #=================================================
 
-# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer Ltotal à la place de L(0).
+# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer Ltotal à la place de L(0).
 
 r0 = 15   # mum
 vl = 1e6  # from mol to mum
@@ -49,8 +55,8 @@ D = 50 * 1e3 # needed to be large : units? not sure it makes sens
 #--------------------------------------------------
 # Initial density of cells : gaussian
 
-mu = 45.0
-si = 0.01
+mu = 45
+si = .01
 
 u0 = np.exp(-(r - mu)**2 * si)
 u = u0 # density vector

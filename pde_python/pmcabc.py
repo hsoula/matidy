@@ -2,7 +2,7 @@
 """
 Created on Thu Jun 27 15:41:05 2019
 
-@author: leo
+@author: Léo Meyer
 """
 
 import abcpmc
