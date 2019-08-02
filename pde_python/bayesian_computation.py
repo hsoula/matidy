@@ -3,10 +3,7 @@
 Created on Wed Jun 26 10:39:36 2019
 
 @author: Léo Meyer
-<<<<<<< HEAD
 
-=======
->>>>>>> b192949ac243cf94c81983b06e3668265096fdc6
 """
 
 import numpy as np
