@@ -17,6 +17,8 @@ import A1
 
 #==========================================================
 
+# Ce code met en place l'algorithme ABC basique.
+
 global nr,B,b,vl,mu,si,mass,dx,rmin,r,v,v0
 
 nr = 3 
@@ -143,7 +145,7 @@ N = 10000
 
 P = np.zeros((N,6))
 
-# On remplis P de N jeu de paramètres
+# On remplis P de N jeu de paramètres avec pour chacun une distribution antérieure
 
 P[:,0] = np.random.uniform(0,2,N)
 #P[:,0] = a * np.ones(N)
