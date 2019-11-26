@@ -21,7 +21,7 @@ import A1
 
 #=================================================
 
-# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer Ltotal à la place de L(0).
+# On utilise la méthode de Cranck-Nicolson pour la diffusion dans l'EDP, pour obtenir un scéma implicite. Contrairement au code matlab, on choisit de fixer TG0 à la place de L(0).
 
 r0 = 15   # mum
 vl = 1e6  # from mol to mum
@@ -30,10 +30,10 @@ b  = 0.27 # mol.mum^-2 h^-1
 B  = 125  # mol.h^-1
 kr = 200  # mum
 nr = 3    # hill radius
-kt = 0.01 #  mol
-kL = 0.1  # mol
+l_theta = 0.01 #  mol
+T_theta = 0.1  # mol
 
-Ltotal = 4 # initial total lipid in mol
+TG0 = 4 # initial total lipid in mol
 
 
 #--------------------------------------------------
@@ -74,7 +74,7 @@ v0 = (4/3.) * np.pi * r0**3
 
 #--------------------------------------------------
 
-L = Ltotal - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2)) # variable extracellular lipid, in mol
+T = TG0 - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2)) # variable extracellular lipid, in mol
 
 #--------------------------------------------------
 # Construction des matrices pour le schéma explicites
@@ -88,7 +88,7 @@ C = sparse.diags([-E_,E,-E_],[-1,0,1])
 C = sparse.csc_matrix(C)
 
 #--------------------------------------------------
-Ls = []
+Ts = []
 
 t=0.0
 
@@ -101,8 +101,8 @@ K=0
 while(norme > 1e-12) :
 	K+=1
 	u_old = np.array(u)
-	L_old = L
-	temp = drr1.drr1(r,a,kr,nr,kL,B,b,kt,v0,vl,L)
+	T_old = T
+	temp = drr1.drr1(r,a,kr,nr,T_theta,B,b,l_theta,v0,vl,T)
 	lg = temp[0]
 	lp = temp[1]
 	       
@@ -131,16 +131,16 @@ while(norme > 1e-12) :
 	u[0]  = 0
 	u[-1] = 0
 	
-	L = Ltotal - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2))
+	T = TG0 - dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2))
 	
-	if L<0 :
-		L = 0
+	if T<0 :
+		T = 0
 	    
 	t = t + dt
 	    
 	Ut = dx * np.sum((v - v0) * u * (4 * np.pi * r**2/vl**2))
 	    
-	Ls.append([t,L,Ut])
+	Ts.append([t,T,Ut])
 	
 	norme = linalg.norm(u_old-u)/float(linalg.norm(u_old))
 
@@ -149,7 +149,7 @@ while(norme > 1e-12) :
 
 func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
-func_tau  = lambda x : A1.A1(x,a,kr,nr,kL,B,b,kt,v0,vl,Ls[-1][1])
+func_tau  = lambda x : A1.TauR(x,a,kr,nr,T_theta,B,b,l_theta,v0,vl,Ts[-1][1])
 	
 mass = integrate.quad(func_mass,r0,r_max)[0]
 

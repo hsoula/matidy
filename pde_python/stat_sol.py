@@ -47,8 +47,8 @@ v0 = (4/3.) * np.pi * r0**3
 #=========================================================
 
 # La classe suivante sers à représenter une solution stationnaire du modèle. Elle prend en argument un jeu de paramètre p
-# de la forme suivante : p = np.array([a,kr,kl,KL,D,Ltotal,index,X]) et une masse (i.e. un nombre d'adipocytes).
-# Comme le point fixe n'a pas besoin de index et X, on peut fournir un jeu de paramètre de la forme np.array([a,kr,kl,KL,D,Ltotal]) mais il faudra modifier la fonction self.__fit_test en conséquence,
+# de la forme suivante : p = np.array([a,r_theta,l_theta,T_theta,D,TG0,index,X]) et une masse (i.e. un nombre d'adipocytes).
+# Comme le point fixe n'a pas besoin de index et X, on peut fournir un jeu de paramètre de la forme np.array([a,r_theta,l_theta,KL,D,TG0]) mais il faudra modifier la fonction self.__fit_test en conséquence,
 # pour fixer index et X.
 # A chaque changement de parmètre, il faut appeller la méthode self.change_param qui va changer les champs de la classe
 # et recalculer un point fixe puis une solution stationnaire en fonction des nouveaux paramètres.
@@ -66,31 +66,31 @@ class stationnary_sol :
 		
 		self.param = param
 		
-		self.a,self.kr,self.kl,self.kL,self.D,self.Ltotal = self.param[0:6]
-		self.L_root = self.__solve()
-		self.u = self.__get_u(self.L_root)
+		self.a,self.r_theta,self.l_theta,self.T_theta,self.D,self.TG0 = self.param[0:6]
+		self.T_root = self.__solve()
+		self.u = self.__get_u(self.T_root)
 		
 	def __solve(self) :
 		
-		return opt.root(self.__R,self.Ltotal).x 
+		return opt.root(self.__R,self.TG0).x 
 		
-	def __get_u(self,L_) :
+	def __get_u(self,T_) :
 		
-		equi = np.exp(1/float(self.D) * dx * (np.cumsum(A1.A1(r,self.a,self.kr,nr,self.kL,B,b,self.kl,v0,vl,L_))))
+		equi = np.exp(1/float(self.D) * dx * (np.cumsum(A1.TauR(r,self.a,self.r_theta,nr,self.T_theta,B,b,self.l_theta,v0,vl,T_))))
 		int_equi =  dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 		const = self.mass/int_equi
-		u = const*equi
+		u = const * equi
 		
 		return u
 		
-	def __R(self,L_) :
+	def __R(self,T_) :
 	
-		u_ = self.__get_u(L_)
-		R_L = self.Ltotal - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))
-		if R_L<0 :
-			R_L = 0
+		u_ = self.__get_u(T_)
+		R_T = self.TG0 - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))
+		if R_T<0 :
+			R_T = 0
 		
-		return R_L - L_
+		return R_T - T_
 		
 	def add_noise(self) :
 		noise = 0.02 * np.random.normal(size=r.size)

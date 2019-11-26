@@ -36,15 +36,15 @@ si = 0.01
 
 def u_from_L(L_,q) :
 
-	a,kr,kl,kL,D,Ltotal = q
+	a, r_theta, l_theta, T_theta, D, TG0 = q
 	
-	equi = np.exp(1/float(D) * dx * (np.cumsum(A1.A1(r,a,kr,nr,kL,B,b,kl,v0,vl,L_))))
+	equi = np.exp(1/float(D) * dx * (np.cumsum(A1.TauR(r, a, r_theta, nr, T_theta, B, b, l_theta, v0, vl, L_))))
 	
 	int_equi =  dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 	
 	const = mass/int_equi
 
-	u = const*equi
+	u = const * equi
 	
 	return u
 
@@ -54,11 +54,11 @@ def u_from_L(L_,q) :
 
 def R(L_,q) :
 	
-	Ltotal = q[-1]
+	TG0 = q[-1]
 
 	u_ = u_from_L(L_,q)
 
-	R_L = Ltotal - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))	
+	R_L = TG0 - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))	
 	
 	if R_L<0 :
 		R_L = 0
@@ -118,20 +118,20 @@ mass = integrate.quad(func_mass,r0,r_max)[0]
 #---------------------------------------------------------
 # Paramètres de départ
 
-var = ['a','kr','kl','kL','D','Ltotal']
+var = ['a','r_theta','l_theta','T_theta','D','TG0']
 
 a   = 0.5
-kr  = 200.
-kl  = 0.01
-kL  = 0.1
+r_theta  = 200.
+l_theta  = 0.01
+T_theta  = 0.1
 D   = 50. * 1e3
-Ltotal = 4.
+TG0 = 4.
 
-p0 = np.array([a,kr,kl,kL,D,Ltotal])
+p0 = np.array([a,r_theta,l_theta,T_theta,D,TG0])
 
-L0 = opt.root(R_,p0[-1],args=(p0)).x
+T_inf = opt.root(R_,p0[-1],args=(p0)).x
 	
-u0 = u_from_L(L0,p0)
+u0 = u_from_L(T_inf, p0)
 
 #noise = 0.02 * np.random.normal(size=r.size)
 	
@@ -151,17 +151,17 @@ P = np.zeros((N,6))
 P[:,0] = np.random.uniform(0,2,N)
 #P[:,0] = a * np.ones(N)
 
-P[:,1] = kr * np.ones(N)
+P[:,1] = r_theta * np.ones(N)
 
-P[:,2] = kl * np.ones(N)
+P[:,2] = l_theta * np.ones(N)
 
 P[:,3] = np.random.uniform(0,1,N)
-#P[:,3] = kL * np.ones(N)
+#P[:,3] = T_theta * np.ones(N)
 
 P[:,4] = D * np.ones(N)
 
 P[:,5] = np.random.uniform(0,8,N)
-#P[:,5] = Ltotal * np.ones(N)
+#P[:,5] = TG0 * np.ones(N)
 
 
 # On construit set_P, l'ensemble des jeu de paramètre qu'on va garder.

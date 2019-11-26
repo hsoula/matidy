@@ -26,27 +26,27 @@ import os
 
 # Paramètres de départ
 
-var = ['a','kr','kl','kL','D','Ltotal']
+var = ['a','kr','l_theta','T_theta','D','TG0']
  
 a   = [0.5,.5,.5,.4,.6]
 kr  = [200.,200.,200.,150.,200.]
-kl  = 0.01
-kL  = 0.1
-D   = 50. * 1e3
-Ltotal = [4.,4.,4.,3.,6.]
+l_theta  = 0.01
+T_theta  = 0.1
+D   = 50. * 1e3	
+TG0 = [4.,4.,4.,3.,6.]
 
 j = int((25-r0)/dx)
 indexes=[j,j,j,j-5,j]
 
 X = [.2,.2,.2,.3,.1]
 
-P = [[a[i],kr[i],kl,kL,D,Ltotal[i],indexes[i],X[i]] for i in range(5)]
+P = [[a[i],kr[i],l_theta,T_theta,D,TG0[i],indexes[i],X[i]] for i in range(5)]
 
 #---------------------------------------------------------
 
 mass = 1. # On travaille avec des fonctions de densités
 
-files = os.listdir("../matidy/data/")
+files = os.listdir("../data/")
 files.sort()
 for index,file in enumerate(files) :
 	
@@ -54,15 +54,15 @@ for index,file in enumerate(files) :
 	
 	print (file)
 	
-	histo = np.loadtxt('../matidy/data/'+file)
+	histo = np.loadtxt('../data/'+file)
 		
 	u0 = np.histogram(histo,bins = nx, range = (r0,r_max))[0]
 	
 	first_d = np.argmax(u0!=0)
 	
-	plt.plot(r[first_d::],u0[first_d::])
-	plt.xlim([0,r_max+50])
-	plt.show()
+#	plt.plot(r[first_d::],u0[first_d::])
+#	plt.xlim([0,r_max+50])
+#	plt.show()
 	
 	obj = stationnary_sol(p,1.)
 	
@@ -70,7 +70,7 @@ for index,file in enumerate(files) :
 	obj_f = stationnary_sol(p_,1.)
 	
 	index_ = int(p_[-2])
-	
+	print(p_)
 	X_= p_[-1]
 	
 	plt.plot(r,obj_f.u,label = "u03BB = {:.2f} et {} = {:.2f}".format(X_,r'$r_{data}$',r0 + dx*(index_-1)))
@@ -90,7 +90,7 @@ for index,file in enumerate(files) :
 	plt.ylabel('Fréquence des adipocytes')
 	#plt.savefig('../Rapport/Images/'+file[:-4]+'.png',dpi=1200)	
 	plt.show()
-
+	break
 #=========================================================
 	
 # On fait de l'estimation sur donnée synthétique pour observer l'erreur pour chaque paramètre.
@@ -106,16 +106,16 @@ func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
 mass = integrate.quad(func_mass,r0,r_max)[0]
 
-var = ['a', 'kr', 'kl', 'D', 'Ltotal']
+var = ['a', 'kr', 'l_theta', 'D', 'TG0']
 
 a   = 0.5
 kr  = 200.
-kl  = 0.01
-kL  = 0.1
+l_theta  = 0.01
+T_theta  = 0.1
 D   = 50. * 1e3
-Ltotal = 4.
+TG0 = 4.
 
-p0_ = np.array([a,kr,kl,D,Ltotal,0,0])
+p0_ = np.array([a,kr,l_theta,D,TG0,0,0])
 
 N = 100
 
@@ -192,7 +192,7 @@ for v,e in zip(var,error) :
 """
 
 #=========================================================
-# On affiche la corrélation entre les 3 paramètres d'intérêts : a,KL et L_total.
+# On affiche la corrélation entre les 3 paramètres d'intérêts : a, T_theta et TG0.
 """
 fig, axs = plt.subplots(1,3)
 
@@ -200,9 +200,9 @@ axs[0].plot(P[:,0],P[:,3],"o")
 axs[1].plot(P[:,0],P[:,-1],"o")
 axs[2].plot(P[:,3],P[:,-1],"o")
 
-axs[0].set(xlabel="a",ylabel="KL")
-axs[1].set(xlabel="a",ylabel="Ltotal")
-axs[2].set(xlabel="KL",ylabel="Ltotal")
+axs[0].set(xlabel="a",ylabel="T_theta")
+axs[1].set(xlabel="a",ylabel="TG0")
+axs[2].set(xlabel="T_theta",ylabel="TG0")
 
 fig.tight_layout()
 plt.show()

@@ -33,15 +33,15 @@ si = 0.01
 
 
 
-# Fonctions utiles par la suite
+# Fonctions utiles par la suites
 
-def u_from_L(L_,q) :
+def u_from_T(T_,q) :
 
-	a,kr,kl,kL,D,Ltotal = q
-	tau= lambda x : A1.A1(x,a,kr,nr,kL,B,b,kl,v0,vl,L_)
+	a, kr, l_theta, T_theta, D, TG0 = q
+	tau= lambda x : A1.TauR(x, a, kr, nr, T_theta, B, b, l_theta, v0, vl, T_)
 	
 	equi = np.exp(1/float(D) * dx * np.cumsum(np.array(list(map(tau,r)))))
-	equi = np.array(equi,dtype=np.float128)
+	equi = np.array(equi, dtype=np.float128)
 	
 	int_equi =  dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 #	print(int_equi)
@@ -57,13 +57,13 @@ def u_from_L(L_,q) :
 
 #-----------------------------------------------------------
 
-def R(L_,q) :
+def R(T_,q) :
 	
-	Ltotal = q[-1]
+	TG0 = q[-1]
 
-	u_ = u_from_L(L_,q)
+	u_ = u_from_T(T_,q)
 
-	R_L = Ltotal - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))	
+	R_L = TG0 - dx * np.sum((v - v0) * u_ * (4 * np.pi * r**2/vl**2))	
 	
 	if R_L<0 :
 		R_L = 0
@@ -71,8 +71,8 @@ def R(L_,q) :
 	return R_L
 
 	
-def R_(L_,q) :
-	return R(L_,q) - L_
+def R_(T_,q) :
+	return R(T_,q) - T_
 
 	
 #-----------------------------------------------------------
@@ -91,9 +91,9 @@ def dist(x,y) :
 
 def data(theta) :
 	
-	L = opt.root(R_,theta[-1],args=(theta)).x
+	T = opt.root(R_,theta[-1],args=(theta)).x
 	
-	u = u_from_L(L,theta)
+	u = u_from_T(T,theta)
 
 	return u
 
@@ -112,16 +112,16 @@ mass = integrate.quad(func_mass,r0,r_max)[0]
 #---------------------------------------------------------
 # Paramètres de départ
 
-var = [r'$a$',r'$\kappa_r$',r'$\kappa_l$',r'$\kappa_L$',r'$D$',r'$L_{total}$']
+var = [r'$a$',r'$r_\theta$',r'$L_\theta$',r'$T_\theta$',r'$D$',r'$TG0$']
 
 a   = 0.5
 kr  = 200.
-kl  = 0.01
-kL  = 0.1
+l_theta  = 0.01
+T_theta  = 0.1
 D   = 50. * 1e3
-Ltotal = 4.
+TG0 = 4.
 
-p0 = np.array([a,kr,kl,kL,D,Ltotal])
+p0 = np.array([a, kr, l_theta, T_theta, D, TG0])
 
 #Une donné synthétique
 
