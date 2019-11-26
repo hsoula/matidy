@@ -5,17 +5,12 @@ Created on Thu Jun 27 15:41:05 2019
 @author: Léo Meyer
 """
 
-import abcpmc
-
+#import abcpmc
 import numpy as np
-
 import scipy.optimize as opt
 from scipy import integrate
-
 import matplotlib.pyplot as plt
-
 import A1
-
 from stat_sol import dx,r0,r_max,r,nx,stationnary_sol
 
 #==========================================================
@@ -35,7 +30,7 @@ si = 0.01
 
 # Fonctions utiles par la suites
 
-def u_from_T(T_,q) :
+def u_from_T(T_, q) :
 
 	a, r_theta, l_theta, T_theta, D, TG0 = q
 	tau= lambda x : A1.TauR(x, a, r_theta, nr, T_theta, B, b, l_theta, v0, vl, T_)
@@ -98,142 +93,145 @@ def data(theta) :
 	return u
 
 
-#=========================================================
 
-v  = (4/3.) * np.pi * r**3
-v0 = (4/3.) * np.pi * r0**3
+if __name__ == "__main__":
 
-#-----------------------------------------------------------
+	#=========================================================
 
-func_mass = lambda x : np.exp(-(x - mu)**2 * si)
+	v  = (4/3.) * np.pi * r**3
+	v0 = (4/3.) * np.pi * r0**3
 
-mass = integrate.quad(func_mass,r0,r_max)[0]
+	#-----------------------------------------------------------
 
-#---------------------------------------------------------
-# Paramètres de départ
+	func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
-var = [r'$a$',r'$r_\theta$',r'$L_\theta$',r'$T_\theta$',r'$D$',r'$TG0$']
+	mass = integrate.quad(func_mass,r0,r_max)[0]
 
-a   = 0.5
-r_theta  = 200.
-l_theta  = 0.01
-T_theta  = 0.1
-D   = 50. * 1e3
-TG0 = 4.
+	#---------------------------------------------------------
+	# Paramètres de départ
 
-p0 = np.array([a, r_theta, l_theta, T_theta, D, TG0])
+	var = [r'$a$',r'$r_\theta$',r'$L_\theta$',r'$T_\theta$',r'$D$',r'$TG0$']
 
-#Une donné synthétique
+	a   = 0.5
+	r_theta  = 200.
+	l_theta  = 0.01
+	T_theta  = 0.1
+	D   = 50. * 1e3
+	TG0 = 4.
 
-"""
-sol = stationnary_sol(p0,mass)
+	p0 = np.array([a, r_theta, l_theta, T_theta, D, TG0])
 
-sol.add_noise()
+	#Une donné synthétique
 
-u0 = sol.u
+	"""
+	sol = stationnary_sol(p0,mass)
 
-plt.plot(r,u0)
-plt.show()
-"""
-#---------------------------------------------------------
+	sol.add_noise()
 
-#ABC avec des données expérimentales
+	u0 = sol.u
 
-mass = 1. # On travaille avec des fonctions de densités
+	plt.plot(r,u0)
+	plt.show()
+	"""
+	#---------------------------------------------------------
 
-histo = np.loadtxt('../matidy/data/Hys-D0-1-1.txt')
+	#ABC avec des données expérimentales
 
-u0 = np.histogram(histo,bins = nx, range = (r0,r_max))[0]
+	mass = 1. # On travaille avec des fonctions de densités
 
-lamb = (dx*np.sum(u0))/(1-0.2)
+	histo = np.loadtxt('../matidy/data/Hys-D0-1-1.txt')
 
-u0=u0/lamb
+	u0 = np.histogram(histo,bins = nx, range = (r0,r_max))[0]
 
-synth = stationnary_sol(p0,mass)
+	lamb = (dx*np.sum(u0))/(1-0.2)
 
-p_ = synth.fit(u0)
-print(p_)
+	u0=u0/lamb
 
-synth.change_param(p_)
-#synth.add_noise(0.001)
+	synth = stationnary_sol(p0,mass)
 
-plt.plot(r,synth.u)
-plt.plot(r,u0)
-plt.show()
+	p_ = synth.fit(u0)
+	print(p_)
 
-#print(dist(synth.u,u0))
+	synth.change_param(p_)
+	#synth.add_noise(0.001)
 
-#---------------------------------------------------------
-
-#On choisit une moyenne 
-
-#means = p0
-means = p_
-
-#On choisit une distriution antérieure
-
-#prior = abcpmc.TophatPrior(min = [0,150,0,0,4*1e4,0],max=[2,300,0.1,1,6*1e4,8])
-
-prior = abcpmc.TophatPrior(min = [0.5 * param for param in means], max = [1.5 * param for param in means])
-
-#prior = abcpmc.GaussianPrior(p0,np.eye(len(p0)))
-
-#---------------------------------------------------------
-
-#On définit une suite d'epsilon
-
-T = 10
-
-eps_start = 5
-eps_end   = 0.1
-eps = abcpmc.LinearEps(T, eps_start, eps_end)
-
-#---------------------------------------------------------
-
-sampler = abcpmc.Sampler(N=1000, Y = synth.u, postfn = data, dist = dist)
-
-pools = []
-
-
-for pool in sampler.sample(prior, eps) :
-	print(pool.t)
-#	eps.eps = np.percentile(pool.dists, 75)
-#	if eps.eps < eps_end:
-#		   eps.eps = eps_end
-	pools.append(pool)
-sampler.close()
-
-#---------------------------------------------------------
-
-#On affiche l'évolution de la valeur moyenne au cour du temps
-
-for i in range(len(means)):
-	moments = np.array([abcpmc.weighted_avg_and_std(pool.thetas[:,i], pool.ws, axis=0) for pool in pools])
-	plt.errorbar(range(T), moments[:, 0], moments[:, 1],label=var[i])
-	plt.hlines(means[i], 0, T, linestyle="dotted", linewidth=0.7)
-	plt.legend()
-	plt.xlim([-.5, T])
+	plt.plot(r,synth.u)
+	plt.plot(r,u0)
 	plt.show()
 
-#---------------------------------------------------------
-	
-#On affiche les distributions postérieures
+	#print(dist(synth.u,u0))
 
-import corner
-samples = np.vstack([pool.thetas for pool in pools])
-fig = corner.corner(samples, labels = var,truths= means)
-fig.savefig('../Rapport/Images/abcpmc_data.png')
-plt.show()
+	#---------------------------------------------------------
 
-#---------------------------------------------------------
+	#On choisit une moyenne 
 
-#On affiche la moyenne, l'écart type et le coefficient de variation.
-for i in range(len(means)) :
-		x_ = sum(samples[:,i])/len(samples)
-		sig = np.sqrt(sum(samples[:,i]**2)/len(samples) -x_**2)
-		sig_norm = sig/x_
+	#means = p0
+	means = p_
+
+	#On choisit une distriution antérieure
+
+	#prior = abcpmc.TophatPrior(min = [0,150,0,0,4*1e4,0],max=[2,300,0.1,1,6*1e4,8])
+
+	prior = abcpmc.TophatPrior(min = [0.5 * param for param in means], max = [1.5 * param for param in means])
+
+	#prior = abcpmc.GaussianPrior(p0,np.eye(len(p0)))
+
+	#---------------------------------------------------------
+
+	#On définit une suite d'epsilon
+
+	T = 10
+
+	eps_start = 5
+	eps_end   = 0.1
+	eps = abcpmc.LinearEps(T, eps_start, eps_end)
+
+	#---------------------------------------------------------
+
+	sampler = abcpmc.Sampler(N=1000, Y = synth.u, postfn = data, dist = dist)
+
+	pools = []
+
+
+	for pool in sampler.sample(prior, eps) :
+		print(pool.t)
+	#	eps.eps = np.percentile(pool.dists, 75)
+	#	if eps.eps < eps_end:
+	#		   eps.eps = eps_end
+		pools.append(pool)
+	sampler.close()
+
+	#---------------------------------------------------------
+
+	#On affiche l'évolution de la valeur moyenne au cour du temps
+
+	for i in range(len(means)):
+		moments = np.array([abcpmc.weighted_avg_and_std(pool.thetas[:,i], pool.ws, axis=0) for pool in pools])
+		plt.errorbar(range(T), moments[:, 0], moments[:, 1],label=var[i])
+		plt.hlines(means[i], 0, T, linestyle="dotted", linewidth=0.7)
+		plt.legend()
+		plt.xlim([-.5, T])
+		plt.show()
+
+	#---------------------------------------------------------
 		
-#		sd_p = np.sqrt(sum(samples[:,i]**2)/len(samples) -means[i]**2)
-#		sd_p_norm = sd_p/(max(samples[:,i]) - min(samples[:,i]))
-		
-		print("{:12} : {:.4f} \u00B1 {:.4f} | {:.4f}".format(var[i],x_,sig,sig_norm))
+	#On affiche les distributions postérieures
+
+	import corner
+	samples = np.vstack([pool.thetas for pool in pools])
+	fig = corner.corner(samples, labels = var,truths= means)
+	fig.savefig('../Rapport/Images/abcpmc_data.png')
+	plt.show()
+
+	#---------------------------------------------------------
+
+	#On affiche la moyenne, l'écart type et le coefficient de variation.
+	for i in range(len(means)) :
+			x_ = sum(samples[:,i])/len(samples)
+			sig = np.sqrt(sum(samples[:,i]**2)/len(samples) -x_**2)
+			sig_norm = sig/x_
+			
+	#		sd_p = np.sqrt(sum(samples[:,i]**2)/len(samples) -means[i]**2)
+	#		sd_p_norm = sd_p/(max(samples[:,i]) - min(samples[:,i]))
+			
+			print("{:12} : {:.4f} \u00B1 {:.4f} | {:.4f}".format(var[i],x_,sig,sig_norm))
