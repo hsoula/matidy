@@ -26,7 +26,7 @@ vl = 1e6  # from mol to mum
 a  = 0.5  # mol.mum^-2 h^-1       # need a larger a to have bimodal
 b  = 0.27 # mol.mum^-2 h^-1
 B  = 125  # mol.h^-1
-kr = 200  # mum
+r_theta = 200  # mum
 nr = 3    # hill radius
 l_theta = 0.01 #  mol
 T_theta = 0.1  # mol
@@ -90,7 +90,7 @@ while(norme > 1e-12) :
 	K+=1
 	u_old = np.array(u)
 	T_old = T
-	temp = drr1.drr1(r,a,kr,nr,T_theta,B,b,l_theta,v0,vl,T)
+	temp = drr1.drr1(r,a,r_theta,nr,T_theta,B,b,l_theta,v0,vl,T)
 	lg = temp[0]
 	lp = temp[1]
 
@@ -135,7 +135,7 @@ while(norme > 1e-12) :
 
 func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
-func_tau  = lambda x : A1.TauR(x,a,kr,nr,T_theta,B,b,l_theta,v0,vl,Ts[-1][1])
+func_tau  = lambda x : A1.TauR(x,a,r_theta,nr,T_theta,B,b,l_theta,v0,vl,Ts[-1][1])
 	
 mass = integrate.quad(func_mass,r0,r_max)[0]
 

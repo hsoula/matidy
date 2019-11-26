@@ -26,7 +26,7 @@ vl = 1e6  # from mol to mum
 a  = 0.5  # mol.mum^-2 h^-1       # need a larger a to have bimodal
 b  = 0.27 # mol.mum^-2 h^-1
 B  = 125  # mol.h^-1
-kr = 200  # mum
+r_theta = 200  # mum
 nr = 3    # hill radius
 l_theta = 0.01 #  mol
 T_theta = 0.1  # mol
@@ -81,7 +81,7 @@ def R(T_) :
 	func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
 	mass = integrate.quad(func_mass,r0,r_max)[0]
-	equi = np.exp(1/float(D) * dx * (np.cumsum(A1.TauR(r,a,kr,nr,T_theta,B,b,l_theta,v0,vl,T_)) - r[0]))
+	equi = np.exp(1/float(D) * dx * (np.cumsum(A1.TauR(r,a,r_theta,nr,T_theta,B,b,l_theta,v0,vl,T_)) - r[0]))
 	
 	int_equi =  dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 	
@@ -109,7 +109,7 @@ print ('T_inf = ',T_inf)
 func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
 mass = integrate.quad(func_mass,r0,r_max)[0]
-equi = np.exp(1/float(D) * dx * (np.cumsum(A1.TauR(r,a,kr,nr,T_theta,B,b,l_theta,v0,vl,T_inf)) - r[0]))
+equi = np.exp(1/float(D) * dx * (np.cumsum(A1.TauR(r,a,r_theta,nr,T_theta,B,b,l_theta,v0,vl,T_inf)) - r[0]))
 	
 int_equi =  dx * (np.sum(equi) - 0.5 * (equi[0] + equi[-1]))
 	

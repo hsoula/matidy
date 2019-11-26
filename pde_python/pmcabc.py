@@ -37,8 +37,8 @@ si = 0.01
 
 def u_from_T(T_,q) :
 
-	a, kr, l_theta, T_theta, D, TG0 = q
-	tau= lambda x : A1.TauR(x, a, kr, nr, T_theta, B, b, l_theta, v0, vl, T_)
+	a, r_theta, l_theta, T_theta, D, TG0 = q
+	tau= lambda x : A1.TauR(x, a, r_theta, nr, T_theta, B, b, l_theta, v0, vl, T_)
 	
 	equi = np.exp(1/float(D) * dx * np.cumsum(np.array(list(map(tau,r)))))
 	equi = np.array(equi, dtype=np.float128)
@@ -115,13 +115,13 @@ mass = integrate.quad(func_mass,r0,r_max)[0]
 var = [r'$a$',r'$r_\theta$',r'$L_\theta$',r'$T_\theta$',r'$D$',r'$TG0$']
 
 a   = 0.5
-kr  = 200.
+r_theta  = 200.
 l_theta  = 0.01
 T_theta  = 0.1
 D   = 50. * 1e3
 TG0 = 4.
 
-p0 = np.array([a, kr, l_theta, T_theta, D, TG0])
+p0 = np.array([a, r_theta, l_theta, T_theta, D, TG0])
 
 #Une donné synthétique
 

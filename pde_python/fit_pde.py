@@ -26,10 +26,10 @@ import os
 
 # Paramètres de départ
 
-var = ['a','kr','l_theta','T_theta','D','TG0']
+var = ['a','r_theta','l_theta','T_theta','D','TG0']
  
 a   = [0.5,.5,.5,.4,.6]
-kr  = [200.,200.,200.,150.,200.]
+r_theta  = [200.,200.,200.,150.,200.]
 l_theta  = 0.01
 T_theta  = 0.1
 D   = 50. * 1e3	
@@ -40,7 +40,7 @@ indexes=[j,j,j,j-5,j]
 
 X = [.2,.2,.2,.3,.1]
 
-P = [[a[i],kr[i],l_theta,T_theta,D,TG0[i],indexes[i],X[i]] for i in range(5)]
+P = [[a[i],r_theta[i],l_theta,T_theta,D,TG0[i],indexes[i],X[i]] for i in range(5)]
 
 #---------------------------------------------------------
 
@@ -106,16 +106,16 @@ func_mass = lambda x : np.exp(-(x - mu)**2 * si)
 
 mass = integrate.quad(func_mass,r0,r_max)[0]
 
-var = ['a', 'kr', 'l_theta', 'D', 'TG0']
+var = ['a', 'r_theta', 'l_theta', 'D', 'TG0']
 
 a   = 0.5
-kr  = 200.
+r_theta  = 200.
 l_theta  = 0.01
 T_theta  = 0.1
 D   = 50. * 1e3
 TG0 = 4.
 
-p0_ = np.array([a,kr,l_theta,D,TG0,0,0])
+p0_ = np.array([a,r_theta,l_theta,D,TG0,0,0])
 
 N = 100
 
