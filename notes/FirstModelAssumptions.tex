@@ -30,18 +30,19 @@ The link between the radius of a cell $r$ and $l$ the lipid amount in this cell 
 $$V(r) = \dfrac{4}{3} \pi r^3 \quad V_l l = V(r) - V_{0}$$
 with $V_{0} = \dfrac{4}{3} \pi r_{0}^3$, minimum volume of an adipocyte, so $\dfrac{dl}{dt} = \dfrac{4\pi}{V_l} \dfrac{dr}{dt} r^2$.\\
 
-Model the lipogenesis and the lipolysis (fluxes of triglycerides) : 
-$$\dfrac{dl}{dt} = V_l a r^2 \dfrac{T}{T + T_{\theta}} \dfrac{r_{\theta}^{n_r}}{r^{n_r}+r_{\theta}^{n_r}} - V_l (B + br^2) \dfrac{l}{l + V_l l_{\theta}}$$
+Model the lipogenesis and the lipolysis (fluxes of triglycerides), see Soula et al. (2013): 
+$$\dfrac{dl}{dt} = a r^2 \dfrac{T}{T + T_{\theta}} \dfrac{r_{\theta}^{n_r}}{r^{n_r}+r_{\theta}^{n_r}} - (B + br^2) \dfrac{l}{l + l_{\theta}}$$
 we rewrite with the variable $r$ : 
-$$\dfrac{dr}{dt} = \dfrac{aV_l}{4\pi}  \dfrac{T}{T + T_{\theta}} \dfrac{r^{n_r}}{r^{n_r}+ r_{\theta}^{n_r}} - V_l \dfrac{(B + br^2)}{4\pi r^2} \dfrac{V(r) - V_0}{V(r) - V_0 + V_l  l_{\theta}} = \tau(r, T)$$
+$$\dfrac{dr}{dt} = \dfrac{aV_l}{4\pi}  \dfrac{T}{T + T_{\theta}} \dfrac{r_{\theta}^{n_r}}{r^{n_r}+ r_{\theta}^{n_r}} - V_l \dfrac{(B + br^2)}{4\pi r^2} \dfrac{V(r) - V_0}{V(r) - V_0 + V_l  l_{\theta}} = \tau(r, T)$$
 From these fluxes, the dynamics of the \sout{number} density of adypocytes $u$ is described by 
 $$\partial_t u(t, r) + \partial_r( \tau(r, T(t)) u(t,r) - D \partial_r u(t,r)) = 0$$
 with $D$ a diffusion coefficient in $\mu m^2 . h^{-1}$.
 
 The intracellular quantity of triglycerides (in $nmol$) is $U(t) = \displaystyle \int l u dl$. Changing to variable $r$, 
-$$U(t) = \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{Vl} u(t, r) \dfrac{4\pi r^2}{Vl} dr$$
+$$U(t) = \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{V_l} u(t, r) \dfrac{4\pi r^2}{V_l} dr$$
 
-The total amount of triglycerides is assumed constant over time : $\dfrac{d}{dt}(T(t) + U(t)) = 0$, we denote the initial quantity of triglycerides by $T_{g0}$ so for all time $t$, $$T(t) = T_{g0} - U(t) =  T_{g0} - \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{Vl} u(t, r) \dfrac{4\pi r^2}{Vl} dr$$
+The total amount of triglycerides is assumed constant over time : $\dfrac{d}{dt}(T(t) + U(t)) = 0$, we denote the initial quantity of triglycerides by $T_{g0}$ so for all time $t$, $$T(t) = T_{g0} - U(t) =  T_{g0} - \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{V_l} u(t, r) \dfrac{4\pi r^2}{V_l} dr$$
+A consequence of the model is that number of cells is constant, for all $t$, $$ \displaystyle \int_{r_0}^{r_{max}} u(t, r) dr = \displaystyle \int_{r_0}^{r_{max}} u(0, r) dr = M $$ 
 Table \ref{Tab:VarParUnits} sums up all parameters and variable, including units.
 
 \begin{table}
@@ -52,13 +53,15 @@ $t$ & $h$ & time in hours \\
 $r$ & $\mu m$ & adipocyte radius \\
 $T(t)$ &  $nnol$ & triglycerides ( = lipids) in the blood \\
 $u(t,r)$ & - & adipocyte density at time $t$ with respect to $r$ \\
+$M$ & cell number & total number of adipocytes \\
 $l$ & $nnol$ & the lipid amount in an adipocyte \\
 $V_0$ & $\mu m ^3$ & minimum volume of an adipocyte : empty of lipid \\
 $r_0$ & $\mu m$ & minimum adipocyte radius, when it contains no lipid \\
-$Vl$ &  $\mu m ^3 . nmol^{-1}$ & volume taken by 1 $nmol$ of triglyceride \\ 
+$r_{max}$ & $\mu m$ & maximum adipocyte radius \\
+$V_l$ &  $\mu m ^3 . nmol^{-1}$ & volume taken by 1 $nmol$ of triglyceride \\ 
 $a$ & $nmol. \mu m ^{-2} . h^{-1}$ & the surface limited diffusion rate  \\
 $T_{\theta}$ & $nmol$ & constant of Michaelis-Menten term $T/(T+T_{\theta}) = 1/2$ when $T = T_{\theta}$ \\
-$r_{\theta}$ & $\mu m$ & Hill function cutoff radius, for $r > r_{\theta}$ lipogenesis rate decreases dramatically \\
+$r_{\theta}$ & $\mu m$ & Hill function cutoff radius, for $r > r_{\theta}$ lipogenesis rate decreases  \\
 $n_r$ & - & $n_r > 0$ power in the Hill function \\
 $B$ & $nmol . h^{-1}$ & basal lipolysis \\
 $b$ & $nmol .\mu m ^{-2} . h^{-1}$ & part of lipolysis depending on organic compounds (catecholamines) \\
@@ -81,6 +84,6 @@ First, we assume a constant number of cells : $(\tau(r, T) u(t,r) - D \partial_r
 
 
 Then, we will assumed that when the level of triglycerides increases too largely, pre-adipocytes differentiate into adipocytes. This recruitment is modeled with the $r_0$ BC, as follows,
-$$(\tau(r, T) u(t,r) - D \partial_r u(t,r)) |_{r_{0}}= f(T(t))$$ with $f(T(t)) = \alpha T(t)$ or $f(T(t)) = \alpha \dfrac{T(t)}{(T(t)+\kappa_{\theta})}$ 
+$$(\tau(r, T) u(t,r) - D \partial_r u(t,r)) |_{r_{0}}= f(T(t))$$ with $f(T(t)) = \alpha T(t)$ or $f(T(t)) = \alpha \dfrac{T(t)}{(T(t)+T_{\theta})}$ 
 
 \end{document}
