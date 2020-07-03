@@ -40,117 +40,124 @@ The functions $s_i$ verify the equations,
 $$\partial_y F \, s_i + \partial_{\dot{y}} F \, \dot{s}_i + \partial_{p_i} F = 0$$
 To compute the traditional sensitivity, we are solving the system $F(t, y, \dot{y}, p) = 0$ and $\partial_y F \, s_i + \partial_{\dot{y}} F \, \dot{s}_i + \partial_{p_i} F = 0$, we are computing $y$ and $s$ at the same time. 
 
-We explicitly write the system of equation for our case. 
+We explicitly write the system of equation for our case, on the discretized version ($u(r) = [u(r_0), u(r_0+dr), \dots, u(r_{max})]$, with $r_0 + kdr = r_k$, and $u(r_k) = u_k$). 
 $$F(r, y, p) = \begin{pmatrix}
-y_1 - T_{g0} + \displaystyle  \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{V_l} y_2 \dfrac{4\pi r^2}{V_l} dr \\
-y_2 - \displaystyle \dfrac{M}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right)
+u(r) - \displaystyle \dfrac{M}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right)\\
+T - T_{g0} + \displaystyle  \int_{r_0}^{r_{max}} \dfrac{V(s) - V_0}{V_l} u(s) \dfrac{4\pi s^2}{V_l} ds \\
+
 \end{pmatrix} $$
-with $y = (y_1, y_2)^{t} = (T, u)^{t}$, and $p =(a, T_{\theta}, r_{\theta}, l_{\theta}, D, T_{g0}, M)^t$.
+
+$$F(r, y, p) = \begin{pmatrix}
+y_k - \displaystyle \dfrac{M}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r_k} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right) \text{  for } k = 0 \dots N \\
+y_{N+1} - T_{g0} +\dfrac{4\pi}{V_l^ 2} d_r \left( \dfrac{(V(r_{max}) - V_0) y_N r_{max}^2 - 0 }{2} + \displaystyle\sum_{k=1}^{k=N-1} (V(r_k) - V_0) y_k r_k^2 \right) \\
+\end{pmatrix} $$
+Let $g$ denote the function $g(x, y_{N+1}) = \int_{r_{0}}^{x} \frac{1}{D} \tau(s, y_{N+1}) ds$. 
+Let set $y = (y_0, y_1, \dots, y_{N+1})^{t} = (u_0, u_1, \dots, u_N, T)^{t}$, and $p =(a, T_{\theta}, r_{\theta}, l_{\theta}, D, T_{g0}, M)^t$.
 For the sensitivity equations, $\partial_{\dot{y}} F = 0$ and  
 $$\partial_y F = \begin{pmatrix}
-\partial_{y_1} F_1 & \partial_{y_2} F_1 \\
-\partial_{y_1} F_2 & \partial_{y_2} F_2 \\
+\partial_{y_0} F_0 & \partial_{y_1} F_0 & \dots & \partial_{y_{N+1}} F_0 \\
+\partial_{y_0} F_1 & \partial_{y_1} F_1 & \dots & \partial_{y_{N+1}} F_1 \\
+\vdots & \vdots & & \vdots \\
+\partial_{y_0} F_{N+1} & \partial_{y_1} F_{N+1} & \dots & \partial_{y_{N+1}} F_{N+1}
 \end{pmatrix}$$
 with 
-$\partial_{y_1} F_1 = 1 $, $\partial_{y_2} F_2 = 1$, 
-$$\begin{array}{rcl}
-\partial_{y_2} F_1 & = &\displaystyle \partial_{y_2} \left( \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{V_l} y_2 \dfrac{4\pi r^2}{V_l} dr \right) \\
-& = & \displaystyle \int_{r_0}^{r_{max}} \partial_{y_2} ( \dfrac{V(r) - V_0}{V_l} y_2 \dfrac{4\pi r^2}{V_l} ) dr\\
-& = & \displaystyle \int_{r_0}^{r_{max}} \dfrac{V(r) - V_0}{V_l} \dfrac{4\pi r^2}{V_l} dr\\
-& = & \displaystyle \int_{r_0}^{r_{max}} \dfrac{(4/3)\pi r^3 - V_0}{V_l} \dfrac{4\pi r^2}{V_l} dr\\
-& = & \displaystyle \dfrac{4\pi}{V_l^2} \int_{r_0}^{r_{max}} (4/3)\pi r^5 - V_0 r^2 dr\\
-& = & \dfrac{4\pi}{V_l^2} \left( (4/3)\pi \dfrac{r_{max}^6 - r_0^6}{6} - V_0 \dfrac{r_{max}^3 - r_0^3}{3} \right)\\
-\end{array}$$
-and 
-$\partial_{y_1} F_2  = \displaystyle \partial_{y_1} \left[  - \displaystyle \dfrac{M}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) \right] $, let set $g(r, y_1) = \displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds$, so 
-$$\begin{array}{rcl}
-\partial_{y_1} F_2 & = & \displaystyle \partial_{y_1} \left[  - \dfrac{M}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  (g(r, y_1)) dr}  \, \exp \left( g(r, y_1) \right) \right]  \\
-
- & = &\displaystyle -M \dfrac{ (\partial_{y_1}g) \exp(g)  \int_{r_{0}}^{r_{max}} \exp (g) dr - \exp(g) \partial_{y_1} \left(\int_{r_{0}}^{r_{max}} \exp (g) dr\right)}{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2} \\
-
- & = &\displaystyle -M \exp(g) \dfrac{ (\partial_{y_1}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{y_1}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2} \\
- \end{array}$$
-and 
-$$\partial_{y_1}g =\displaystyle \partial_{y_1} \left( \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) = \int_{r_{0}}^{r} \dfrac{1}{D} \partial_{y_1}\tau(s, y_1) ds $$
-with
-$$ \partial_{y_1}\tau(s, y_1) = \dfrac{aV_l}{4\pi}  \dfrac{T_{\theta}}{(y_1 + T_{\theta})^2} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}}$$
+$\partial_{y_k} F_k = 1 $ and for $k = 0 \dots N$ $\partial_{y_k} F_{k+1} = 0$. In addition, $k = 0 \dots N$ :   
+$$\partial_{y_{N+1}} F_k = -M \exp(g(r_k, y_{N+1})) \left[ \dfrac{ \partial_{y_{N+1}} g(r_k, y_{N+1}) }{\displaystyle \int_{r_0}^{r_{max}} \exp(g(s, y_{N+1})) ds} - \dfrac{\displaystyle \int_{r_0}^{r_{max}} (\partial_{y_{N+1}} g(s, y_{N+1})) \exp(g(s, y_{N+1})) ds}{\left(\displaystyle \int_{r_0}^{r_{max}} \exp(g(s, y_{N+1})) ds \right)^2} \right]
+$$
+with 
+$$\partial_{y_{N+1}}g(x, y_{N+1}) = \displaystyle \partial_{y_{N+1}} \left( \int_{r_{0}}^{x} \frac{1}{D} \tau(s, y_{N+1}) ds \right) = \int_{r_{0}}^{x} \dfrac{1}{D} \partial_{y_{N+1}}\tau(s, y_{N+1}) ds $$
+and,
+$$ \partial_{y_{N+1}}\tau(s, y_{N+1}) = \dfrac{aV_l}{4\pi}  \dfrac{T_{\theta}}{(y_{N+1} + T_{\theta})^2} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}}$$
+so, 
+$$\partial_{y_{N+1}}g(x, y_{N+1}) = \dfrac{aV_l}{4D\pi}  \dfrac{T_{\theta}}{(y_{N+1} + T_{\theta})^2}  \displaystyle \int_{r_{0}}^{x} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds$$
+The remaining terms to compute are the following : \\
+\noindent
+$\partial_{y_k} F_{N+1} = 0 $ for $k = 0$ \\
+\noindent
+$\partial_{y_k} F_{N+1} = \dfrac{4\pi}{V_l^2} dr (V(r_k) - V_0) r_k^2 $ for $k = 1 \dots N-1$ \\
+\noindent
+$\partial_{y_k} F_{N+1} = \dfrac{4\pi}{V_l^2} \dfrac{dr}{2} (V(r_{max}) - V_0) r_{max}^2 $ for $k = N$ \\
 
 \noindent
 The final term to clarify is $\partial_{p_i} F$ for each $p_i$ in $(a, T_{\theta}, r_{\theta}, l_{\theta}, D, T_{g0}, M)$. 
 
 \noindent
-For $ p_0 = a $, we get, 
+For $ p_0 = a $, we get, $k = 0, \dots, N$, 
 $$\partial_{p_0} F = \begin{pmatrix} 
-0 \\ 
-\displaystyle -M \exp(g) \dfrac{ (\partial_{p_0}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{p_0}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2}
+\displaystyle -M \exp(g(r_k, y_{N+1})) \left[\dfrac{ \partial_{p_0}g(r_k, y_{N+1})}{\int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1})) ds} - \dfrac{\int_{r_{0}}^{r_{max}} (\partial_{p_0}g(s, y_{N+1})) \exp (g(s, y_{N+1})) ds }{\left( \int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1}) ds \right)^2} \right] \\
+0
 \end{pmatrix} 
 $$
 with $$\begin{array}{rcl}
-\partial_{p_0}g & = & \displaystyle \partial_{p_0} \left( \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right)\\
-& = & \displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \partial_{p_0}\tau(s, y_1) ds \\
-& = & \displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \dfrac{V_l}{4\pi}  \dfrac{y_1}{y_1 + T_{\theta}} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds \\
-& = & \dfrac{1}{D} \dfrac{V_l}{4\pi}  \dfrac{y_1}{y_1 + T_{\theta}} \displaystyle \int_{r_{0}}^{r}  \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds
+\partial_{p_0}g(x, y_{N+1} & = & \displaystyle \partial_{p_0} \left( \int_{r_{0}}^{x} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right)\\
+& = & \displaystyle \int_{r_{0}}^{x} \dfrac{1}{D} \partial_{p_0}\tau(s, y_{N+1}) ds \\
+
+& = & \displaystyle \int_{r_{0}}^{x} \dfrac{1}{D} \dfrac{V_l}{4\pi}  \dfrac{y_{N+1}}{y_{N+1} + T_{\theta}} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds \\
+
+& = & \dfrac{1}{D} \dfrac{V_l}{4\pi}  \dfrac{y_{N+1}}{y_{N+1} + T_{\theta}} \displaystyle \int_{r_{0}}^{x}  \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds
 \end{array}$$
 
 \noindent
-For $ p_1 = T_{\theta} $, we get, 
+For $ p_1 = T_{\theta} $, we get, $k = 0, \dots, N$, 
 $$\partial_{p_1} F = \begin{pmatrix} 
-0 \\ 
-\displaystyle -M \exp(g) \dfrac{ (\partial_{p_1}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{p_1}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2}
+\displaystyle -M \exp(g(r_k, y_{N+1})) \left[\dfrac{ \partial_{p_1}g(r_k, y_{N+1})}{\int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1})) ds} - \dfrac{\int_{r_{0}}^{r_{max}} (\partial_{p_1}g(s, y_{N+1})) \exp (g(s, y_{N+1})) ds }{\left( \int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1}) ds \right)^2} \right] \\
+0
 \end{pmatrix} 
 $$
 with $$\begin{array}{rcl}
-\partial_{p_1}g & = & \displaystyle \partial_{p_1} \left( \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right)\\
-& = & \displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \partial_{p_1}\tau(s, y_1) ds \\
-& = & \displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{-y_1}{(y_1 + T_{\theta})^2} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds  \\
-& = & \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{-y_1}{(y_1 + T_{\theta})^2} \displaystyle \int_{r_{0}}^{r}  \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds 
+\partial_{p_1}g(x, y_{N+1}) & = & \displaystyle \partial_{p_1} \left( \int_{r_{0}}^{x} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right)\\
+& = & \displaystyle \int_{r_{0}}^{x} \dfrac{1}{D} \partial_{p_1}\tau(s, y_{N+1}) ds \\
+& = & \displaystyle \int_{r_{0}}^{x} \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{-y_{N+1}}{(y_{N+1} + T_{\theta})^2} \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds  \\
+& = & \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{-y_{N+1}}{(y_{N+1} + T_{\theta})^2} \displaystyle \int_{r_{0}}^{x}  \dfrac{r_{\theta}^{n_r}}{s^{n_r}+ r_{\theta}^{n_r}} ds 
 \end{array}$$
 
 
 \noindent
-For $ p_2 = r_{\theta} $, we get, 
+For $ p_2 = r_{\theta} $, we get, $k = 0, \dots, N$, 
 $$\partial_{p_2} F = \begin{pmatrix} 
-0 \\ 
-\displaystyle -M \exp(g) \dfrac{ (\partial_{p_2}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{p_2}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2}
+\displaystyle -M \exp(g(r_k, y_{N+1})) \left[\dfrac{ \partial_{p_2}g(r_k, y_{N+1})}{\int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1})) ds} - \dfrac{\int_{r_{0}}^{r_{max}} (\partial_{p_2}g(s, y_{N+1})) \exp (g(s, y_{N+1})) ds }{\left( \int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1}) ds \right)^2} \right] \\
+0
 \end{pmatrix} 
 $$
-with $$ \partial_{p_2}g  = \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{y_1}{y_1 + T_{\theta}} \displaystyle \int_{r_{0}}^{r} \dfrac{n_r s^{n_r} r_{\theta}^{n_r - 1}}{(s^{n_r}+ r_{\theta}^{n_r})^2} ds $$
+with $$ \partial_{p_2}g(x, y_{N+1})  = \dfrac{1}{D} \dfrac{aV_l}{4\pi}  \dfrac{y_{N+1}}{y_{N+1} + T_{\theta}} \displaystyle \int_{r_{0}}^{x} \dfrac{n_r s^{n_r} r_{\theta}^{n_r - 1}}{(s^{n_r}+ r_{\theta}^{n_r})^2} ds $$
 
 
 
 \noindent
-For $ p_3 = l_{\theta} $, we get, 
+For $ p_3 = l_{\theta} $, we get, $k = 0, \dots, N$,  
 $$\partial_{p_3} F = \begin{pmatrix} 
-0 \\ 
-\displaystyle -M \exp(g) \dfrac{ (\partial_{p_3}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{p_3}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2}
+\displaystyle -M \exp(g(r_k, y_{N+1})) \left[\dfrac{ \partial_{p_3}g(r_k, y_{N+1})}{\int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1})) ds} - \dfrac{\int_{r_{0}}^{r_{max}} (\partial_{p_3}g(s, y_{N+1})) \exp (g(s, y_{N+1})) ds }{\left( \int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1}) ds \right)^2} \right] \\
+0
 \end{pmatrix} 
 $$
-with $$ \partial_{p_3}g  =  \displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} V_l \dfrac{(B + bs^2)}{4\pi s^2} \dfrac{-(V(s) - V_0)V_l}{(V(r) - V_0 + V_l  l_{\theta})^2} ds $$
+with $$ \partial_{p_3}g(x, y_{N+1})  =  \displaystyle \int_{r_{0}}^{x} \dfrac{1}{D} V_l \dfrac{(B + bs^2)}{4\pi s^2} \dfrac{-(V(s) - V_0)V_l}{(V(s) - V_0 + V_l  l_{\theta})^2} ds $$
 
 
 \noindent
-For $ p_4 = D $, we get, 
+For $ p_4 = D $, we get, $k = 0, \dots, N$, 
 $$\partial_{p_4} F = \begin{pmatrix} 
-0 \\ 
-\displaystyle -M \exp(g) \dfrac{ (\partial_{p_4}g) \int_{r_{0}}^{r_{max}} \exp (g) dr - \int_{r_{0}}^{r_{max}} (\partial_{p_4}g) \exp (g) dr }{\left( \int_{r_{0}}^{r_{max}} \exp (g) dr \right)^2}
+\displaystyle -M \exp(g(r_k, y_{N+1})) \left[\dfrac{ \partial_{p_4}g(r_k, y_{N+1})}{\int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1})) ds} - \dfrac{\int_{r_{0}}^{r_{max}} (\partial_{p_4}g(s, y_{N+1})) \exp (g(s, y_{N+1})) ds }{\left( \int_{r_{0}}^{r_{max}} \exp (g(s, y_{N+1}) ds \right)^2} \right] \\
+0
 \end{pmatrix} 
 $$
-with $$ \partial_{p_4}g  =  \displaystyle \int_{r_{0}}^{r} \dfrac{-1}{D^2} \tau(s, y_1) ds $$
+with $$ \partial_{p_4}g(x, y_{N+1})  =  \displaystyle \int_{r_{0}}^{x} \dfrac{-1}{D^2} \tau(s, y_{N+1}) ds $$
 
 
 \noindent
 For $ p_5 = T_{g0} $, we get, 
 $$\partial_{p_5} F = \begin{pmatrix} 
--1 \\  0
+0 \\
+\vdots \\
+-1
 \end{pmatrix} 
 $$
 
 
 \noindent
-For $ p_6 = M $, we get, 
+For $ p_6 = M $, we get,  $k = 0, \dots, N$,
 $$\partial_{p_6} F = \begin{pmatrix} 
-0 \\ 
-- \dfrac{1}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_1) ds \right)
+- \dfrac{1}{\displaystyle \int_{r_{0}}^{r_{max}} \exp  \left(\displaystyle \int_{r_{0}}^{r} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right) dr}  \, \exp \left(\displaystyle  \int_{r_{0}}^{r_k} \dfrac{1}{D} \tau(s, y_{N+1}) ds \right) \\
+0
 \end{pmatrix} 
 $$
 
